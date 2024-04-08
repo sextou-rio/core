@@ -11,25 +11,45 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  username String  @unique
+  id       String      @id @default(cuid())
+  username String      @unique
   password String
-  email    String  @unique
+  email    String      @unique
   name     String
   avatar   String
-  events   Event[]
+  RSVP     RSVP_List[]
 
   @@map("users")
 }
 
 model Event {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String      @unique
   description String
   date        DateTime
   tickets     String?
-  attendees   User[]
+  RSVP        RSVP_List[]
 
   @@map("events")
+}
+
+model RSVP_List {
+  id            Int         @id @default(autoincrement())
+  status        RSVP_Status @relation(fields: [rSVP_StatusId], references: [id])
+  userId        String
+  eventId       String
+  User          User        @relation(fields: [userId], references: [id])
+  Event         Event       @relation(fields: [eventId], references: [id])
+  rSVP_StatusId Int
+
+  @@map("rsvp_list")
+}
+
+model RSVP_Status {
+  id        Int         @id @default(autoincrement())
+  label     String      @default("UNANSWERED")
+  RSVP_List RSVP_List[]
+
+  @@map("rsvp_status")
 }
