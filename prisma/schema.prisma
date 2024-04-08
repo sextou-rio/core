@@ -7,16 +7,17 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:../src/db/dev.db"
 }
 
 model User {
-  id       String @id @default(cuid())
-  username String @unique
+  id       String  @id @default(cuid())
+  username String  @unique
   password String
-  email    String @unique
+  email    String  @unique
   name     String
   avatar   String
+  events   Event[]
 
   @@map("users")
 }
@@ -28,6 +29,7 @@ model Event {
   description String
   date        DateTime
   tickets     String
+  attendees   User[]
 
   @@map("events")
 }
