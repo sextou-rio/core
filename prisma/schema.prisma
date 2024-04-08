@@ -28,7 +28,7 @@ model Event {
   slug        String   @unique
   description String
   date        DateTime
-  tickets     String
+  tickets     String?
   attendees   User[]
 
   @@map("events")
