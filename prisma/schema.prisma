@@ -35,13 +35,13 @@ model Event {
 }
 
 model RSVP_List {
-  id            Int         @id @default(autoincrement())
-  status        RSVP_Status @relation(fields: [rSVP_StatusId], references: [id])
-  userId        String
-  eventId       String
-  User          User        @relation(fields: [userId], references: [id])
-  Event         Event       @relation(fields: [eventId], references: [id])
-  rSVP_StatusId Int
+  id         Int         @id @default(autoincrement())
+  status     RSVP_Status @relation(fields: [rsvpStatus], references: [id])
+  userId     String
+  eventId    String
+  User       User        @relation(fields: [userId], references: [id])
+  Event      Event       @relation(fields: [eventId], references: [id])
+  rsvpStatus Int         @map("rsvp_status")
 
   @@map("rsvp_list")
 }
