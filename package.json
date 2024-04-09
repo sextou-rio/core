@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "db:migrate": "npx prisma migrate dev",
-    "db:studio": "npx prisma studio"
+    "migrate-dev": "npx prisma migrate dev",
+    "studio": "npx prisma studio"
   },
   "keywords": [],
   "author": "",
