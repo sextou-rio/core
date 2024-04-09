@@ -1,8 +1,10 @@
-import { router } from '../server';
+import Express from "express";
 import prisma from '../db/prisma';
 import { batchUsers } from "../lib/mock";
 
-router.get("/users/generate", async (_, res) => {
+const router = Express.Router();
+
+router.get("/generate", async (_, res) => {
   await prisma.user.createMany({
     data: batchUsers(),
   });

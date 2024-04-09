@@ -1,9 +1,11 @@
-import { router } from '../server';
+import Express from "express";
 import prisma from '../db/prisma';
 import { batchEvents } from "../lib/mock";
 // https://www.npmjs.com/package/zod-express-middleware
 
-router.get("/events/generate", async (_, res) => {
+const router = Express.Router();
+
+router.get("/generate", async (_, res) => {
 
   await prisma.event.createMany({
     data: batchEvents(),
@@ -12,7 +14,50 @@ router.get("/events/generate", async (_, res) => {
   return res.status(200).send("events generated")
 })
 
-router.get("/events/:eventId/rsvp/:status", async (req, res) => {
+router.get("/", async (_, res) => {
+
+  const eventsFromTodayOn = await prisma.event.findMany({
+    where: {
+      date: {
+        gte: new Date()
+      }
+    },
+    orderBy: {
+      date: "asc"
+    }
+  })
+
+  return res.status(200).send(eventsFromTodayOn)
+})
+
+router.get("/:eventId/", async (req, res) => {
+
+  const { eventId } = req.params;
+
+  let eventDetails = await prisma.event.findUnique({
+    where: {
+      id: eventId,
+    },
+    include: {
+      RSVP: {
+        select: {
+          User: true,
+          status: true,
+        },
+        orderBy: {
+          rSVP_StatusId: "asc"
+        }
+      }
+    }
+  });
+
+  // TODO: handle user table output
+  // const { RSVP, ...eventData } = eventDetails;
+
+  return res.status(200).send(eventDetails)
+})
+
+router.get("/:eventId/rsvp/:status", async (req, res) => {
 
   const { eventId, status } = req.params;
   const userId = req.header('x-sextou-user');
@@ -27,9 +72,7 @@ router.get("/events/:eventId/rsvp/:status", async (req, res) => {
     return res.status(400).send("Status should be one of enumerated")
   }
 
-  let output;
-
-  output = await prisma.rSVP_List.create({
+  let updateRSVP = await prisma.rSVP_List.create({
     data: {
       eventId,
       userId,
@@ -37,7 +80,7 @@ router.get("/events/:eventId/rsvp/:status", async (req, res) => {
     }
   });
 
-  return res.status(200).send({ output })
+  return res.status(200).send(updateRSVP)
 })
 
 export default router

@@ -1,5 +1,4 @@
 import Express from "express";
-export const router = Express.Router();
 
 import eventsRouter from "./routes/events"
 import usersRouter from "./routes/users"
