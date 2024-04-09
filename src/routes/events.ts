@@ -1,46 +1,43 @@
-import express from 'express';
+import { router } from '../server';
+import prisma from '../db/prisma';
 import { batchEvents } from "../lib/mock";
+// https://www.npmjs.com/package/zod-express-middleware
 
-const router = express.Router();
+router.get("/events/generate", async (_, res) => {
 
-router.get('/', (req, res) => {
-  res.send('Get all events');
-});
+  await prisma.event.createMany({
+    data: batchEvents(),
+  });
 
-// app.get("/events/:eventId/rsvp/:status", async (req, res) => {
+  return res.status(200).send("events generated")
+})
 
-//   const { eventId, status } = req.params;
-//   const userId = req.header('x-sextou-user');
+router.get("/events/:eventId/rsvp/:status", async (req, res) => {
 
-//   if (!userId) {
-//     return res.status(400).send("User ID is needed")
-//   }
+  const { eventId, status } = req.params;
+  const userId = req.header('x-sextou-user');
 
-//   const statusAsNumber = Number(status)
+  if (!userId) {
+    return res.status(400).send("User ID is needed")
+  }
 
-//   if (!statusAsNumber) {
-//     return res.status(400).send("Status should be one of enumerated")
-//   }
+  const statusAsNumber = Number(status)
 
-//   let output;
+  if (!statusAsNumber) {
+    return res.status(400).send("Status should be one of enumerated")
+  }
 
-//   output = await prisma.rSVP_List.create({
-//     data: {
-//       eventId,
-//       userId,
-//       rSVP_StatusId: statusAsNumber,
-//     }
-//   });
+  let output;
 
-//   return res.status(200).send({ output })
-// })
+  output = await prisma.rSVP_List.create({
+    data: {
+      eventId,
+      userId,
+      rSVP_StatusId: statusAsNumber,
+    }
+  });
 
-// app.get("/events/generate", async (_, res) => {
-//   await prisma.event.createMany({
-//     data: batchEvents(),
-//   });
-
-//   return res.status(200).send("events generated")
-// })
+  return res.status(200).send({ output })
+})
 
 export default router
