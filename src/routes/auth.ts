@@ -22,7 +22,7 @@ router.get("/signup", async (_, res) => {
   return res.status(201).send("User created with encrypted password")
 })
 
-router.get("/login", async (_, res) => {
+router.post("/login", async (_, res) => {
 
   const userFound = await prisma.user.findUnique({
     where: {
@@ -38,12 +38,16 @@ router.get("/login", async (_, res) => {
       exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30), // (1 month from now)
     }, 'secretKey')
 
-    return res.status(200).header({
-      'x-sextou-authentication': token
-    }).cookie('sextou-authorization', 5, { maxAge: 900000, httpOnly: true }).send("Login succesful")
+    return res.status(200).cookie('sextou-authentication', token, { maxAge: 900000 }).send("Login succesful. Welcome to the party.")
   }
 
   return res.status(500).send("Login Error")
+})
+
+// req.cookies['sextou-authentication']
+router.get("/logout", async (_, res) => {
+
+  return res.status(200).cookie('sextou-authentication', '', { expires: new Date(0) }).send("Logout succesful. I'm sorry, we'll miss you.")
 })
 
 export default router
